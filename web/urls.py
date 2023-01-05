@@ -1,23 +1,41 @@
-"""web URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from rest_framework import routers, serializers, viewsets
+from prototype.views import TableViewSet, UserViewSet, TablesListView, FieldsListView
+from prototype.serializers import UserSerializer, TableSerializer
+from prototype import views
+import prototype 
+
+# Routers provide an easy way of automatically determining the URL conf.
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'tables', TableViewSet)
+
+# urlpatterns = [
+#     #path("", include("prototype.urls")),
+#     #path("tables/", include("prototype.urls")),
+#     re_path('$', views.index, name='tables'),
+#     path("api/", include(router.urls)),
+#     path('admin/', admin.site.urls),
+#     path('api-auth/', include('rest_framework.urls'))
+# ]
+
+from django.urls import path
+from django.contrib import admin
+
+from tutorial.views import PersonListView
+from prototype.views import FieldCreateForm, FieldDeleteForm, FieldUpdateForm
+from prototype.views import TableCreateForm, TableDeleteForm, TableUpdateForm
 
 urlpatterns = [
-    path("", include("prototype.urls")),
-    path("tables/", include("prototype.urls")),
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("people/", PersonListView.as_view()),
+    path("fields/", FieldsListView.as_view(), name='fields'),
+    path('fields/create/', FieldCreateForm.as_view(), name='field-create'),
+    path('fields/<int:pk>/update/', FieldUpdateForm.as_view(), name='field-update'),
+    path('fields/<int:pk>/delete/', FieldDeleteForm.as_view(), name='field-delete'),
+    path("tables/", TablesListView.as_view(), name='tables'),
+    path('tables/create/', TableCreateForm.as_view(), name='table-create'),
+    path('tables/<int:pk>/update/', TableUpdateForm.as_view(), name='table-update'),
+    path('tables/<int:pk>/delete/', TableDeleteForm.as_view(), name='table-delete'),
 ]

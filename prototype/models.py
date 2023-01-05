@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # # see https://specs.frictionlessdata.io/table-schema/#constraints for more info
 class FieldConstraint(models.Model):
@@ -122,6 +123,10 @@ class Table(models.Model):
     keys = models.ManyToManyField(Key, blank=True)
     fields = models.ManyToManyField(Field, blank=True)
     constraints = models.ManyToManyField(TableConstraint, blank=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return self.name
