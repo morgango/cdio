@@ -15,11 +15,11 @@ All the Tables
 {% render_table table %}
 
 <div class="col  d-flex justify-content-end align-items-center">
-    <a class="btn btn-primary" href="/tables/create" role="button">Add a New Table</a>
+    <a class="btn btn-primary" href="/{{ request.user }}/tables/create/" role="button">Add a New Table</a>
 </div>
 
 
-<p id="debug"></p>
+<p id="debug"> {{ request.user }} </p>
 
 {% endblock %}
 

@@ -24,18 +24,24 @@ from django.urls import path
 from django.contrib import admin
 
 from tutorial.views import PersonListView
+from prototype.views import TableListView
 from prototype.views import FieldCreateForm, FieldDeleteForm, FieldUpdateForm
 from prototype.views import TableCreateForm, TableDeleteForm, TableUpdateForm
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("people/", PersonListView.as_view()),
-    path("fields/", FieldsListView.as_view(), name='fields'),
-    path('fields/create/', FieldCreateForm.as_view(), name='field-create'),
-    path('fields/<int:pk>/update/', FieldUpdateForm.as_view(), name='field-update'),
-    path('fields/<int:pk>/delete/', FieldDeleteForm.as_view(), name='field-delete'),
-    path("tables/", TablesListView.as_view(), name='tables'),
-    path('tables/create/', TableCreateForm.as_view(), name='table-create'),
-    path('tables/<int:pk>/update/', TableUpdateForm.as_view(), name='table-update'),
-    path('tables/<int:pk>/delete/', TableDeleteForm.as_view(), name='table-delete'),
+    path("<str:author>/fields/", FieldsListView.as_view(), name='fields'),
+    path('<str:author>/fields/create/', FieldCreateForm.as_view(), name='field-create'),
+    path('<str:author>/fields/<slug:slug>/update/', FieldUpdateForm.as_view(), name='field-update'),
+    path('<str:author>/fields/<slug:slug>/delete/', FieldDeleteForm.as_view(), name='field-delete'),
+    path('<str:author>/tables/<slug:slug>/', FieldsListView.as_view(), name='field-slug'),
+    # We will need this when we have a field detail view
+    # path('<str:author>/fields/<int:id>/', XXXXXXXXXXXX_View.as_view(), name='field-id'),
+    path("<str:username>/tables/", TablesListView.as_view(), name='tables'),
+    path('<str:author>/tables/create/', TableCreateForm.as_view(), name='table-create'),
+    path('<str:author>/tables/<slug:slug>/update/', TableUpdateForm.as_view(), name='table-update'),
+    path('<str:author>/tables/<slug:slug>/delete/', TableDeleteForm.as_view(), name='table-delete'),
+    path('<str:author>/tables/<int:id>/', FieldsListView.as_view(), name='field-id'),
+    path('tables/', TableListView.as_view(), name='table-list'),
 ]

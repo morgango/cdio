@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-        <title>{% block title %} {% endblock%}</title>
+        <title>{% block page_title %} {% endblock%}</title>
     {%comment %}
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css">
     {% endcomment %}
@@ -14,11 +14,14 @@
 <body class="bootstrap5">
 
 <div class="container" style="max-width: 1152px; width: 1152px">
-    <h1> {% block header %} {% endblock%} </h1>
+    <h1> {% block table_header %} {% endblock%} </h1>
     <div class="col-md-12">
         <div class="row table-responsive">
-            {% block body%} {% endblock%}
+            {% block table%} {% endblock%}
         </div>
+    </div>
+    <div class="col-md-12">
+        <p id="debug">{% block debug%} {% endblock%}</p>
     </div>
 </div>
 

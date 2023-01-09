@@ -15,7 +15,7 @@ Just one Table
 {% render_table table %}
 
 <div class="col  d-flex justify-content-end align-items-center">
-    <a class="btn btn-primary" href="/fields/create/" role="button">Add a New Field</a>
+    <a class="btn btn-primary" href="/{{ request.user }}/fields/create/" role="button">Add a New Field</a>
 </div>
 
 

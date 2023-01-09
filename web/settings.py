@@ -38,16 +38,20 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'rest_framework_datatables',
     'rest_framework',
-    'bootstrap4',
+    'bootstrap5',
     'fontawesomefree',
     'prototype',
     'django_tables2',
-    # 'crispy_forms'
     'tutorial',
+    'guardian',
 ]
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # this is default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

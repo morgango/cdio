@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load bootstrap5 %}
+
+
+{% block page_title %} Create Data {% endblock %}
+
+{% block table_header %} Data Tables {% endblock %}
+
+{% block table %}
+
+{% comment%}
+This is a for loop that iterates through all the table definitions
+{% endcomment%}
+
+{% for table in object_list %}
+    {% if forloop.first %}
+        {# Set up a striped table #}
+        <table class="table table-striped">
+            {# Set up a table header #}
+            <thead>
+                <tr>
+                    <td> # </td>
+                    <td> Table </td>
+                    <td> Description </td>
+                    <td> Fields </td>
+                    <td> Keys </td>
+                    <td> Constraints </td>
+                </tr>
+            </thead>
+            <tbody>
+    {% endif %}
+    <tr>
+        {# Create an ID number based on the for loop iterations #}
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{ table.name }}</td> 
+        <td>{{ table.description }}</td>
+        <td>
+            {# Iterate through the fields for some context #}
+            {% for field in table.fields.all %}
+                {# TODO: Add a link in to each of the individual fields #}
+                {{ field.name }}
+                {# Comma separate things, but not the last field #}
+                {% if not forloop.last and forloop.counter < 4 %} 
+                    ,
+                {% endif %}
+            {% endfor %}
+        </td>
+        {# TODO: Add a loop like we have for fields, if appropriate#}
+        <td>{{ table.keys }}</td>
+        {# TODO: Add a loop like we have for fields, if appropriate#}
+        <td>{{ table.constraints }}</td>
+    </tr>
+    {% if forloop.last %}
+    </tbody>
+    {% endif %}
+{% empty %}
+    <ul>
+        <li>No tables yet.</li>
+    </ul>
+{% endfor %}
+
+{% endblock %}
+
+{% block debug %}
+{{ user.name }}
+{{ author }}
+Something
+{% endblock %}
