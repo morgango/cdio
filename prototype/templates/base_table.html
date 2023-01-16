@@ -6,6 +6,8 @@
 
 {% include 'prototype/common/navbar.html' %}
 
+<body>
+
 <div class="container" style="max-width: 1152px; width: 1152px">
     <h1> {% block table_header %} {% endblock%} </h1>
     <div class="col-md-12">
@@ -17,6 +19,8 @@
         <p id="debug">{% block debug%} {% endblock%}</p>
     </div>
 </div>
+
+{% block modal%} {endblock}
 
 </body>
 

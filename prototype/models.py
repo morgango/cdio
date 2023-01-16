@@ -1,6 +1,8 @@
 from django.db import models
 from django.conf import settings
 from django.utils.text import slugify
+from django.urls import reverse
+from guardian.models import GroupObjectPermissionBase, UserObjectPermissionBase
 
 # # see https://specs.frictionlessdata.io/table-schema/#constraints for more info
 class FieldConstraint(models.Model):
@@ -80,7 +82,6 @@ class TableConstraint(models.Model):
             self.slug = self._generate_unique_slug(self.name)
         return super().save(*args, **kwargs)
 
-
 # see  https://specs.frictionlessdata.io/table-schema/#field-descriptors for more info
 class Field(models.Model):
     FIELD_TYPES = (
@@ -152,7 +153,6 @@ class Field(models.Model):
             self.slug = self._generate_unique_slug(self.name)
         return super().save(*args, **kwargs)
 
-
 class Key(models.Model):
     KEY_TYPES = (
         ('Primary', 'primary'),
@@ -200,13 +200,19 @@ class Table(models.Model):
         default=0,
     )
 
+    class Meta:
+        default_permissions = ('add', 'change', 'delete')
+        permissions = (
+            ('view_table', 'Can view table'),
+        )
+
     def __str__(self):
         return self.name
 
     # TODO: Set a path so that we can have tables and fields accessed by author and slug
     # See https://wellfire.co/learn/fast-and-beautiful-urls-with-django/
     def get_absolute_url(self):
-        return reverse('table', kwargs={'author': self.author, 'slug': self.slug})
+        return reverse('table-slug', kwargs={'author': self.author, 'slug': self.slug})
         
     def _generate_unique_slug(self):
         unique_slug = slugify(self.name)
@@ -218,5 +224,5 @@ class Table(models.Model):
         
     def save(self, *args, **kwargs):  # new
         if not self.slug:
-            self.slug = self._generate_unique_slug(self.name)
+            self.slug = self._generate_unique_slug()
         return super().save(*args, **kwargs)

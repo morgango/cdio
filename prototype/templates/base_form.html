@@ -1,0 +1,21 @@
+{% include 'prototype/common/header.html' %}
+
+<body class="bootstrap5">
+
+{% load static %}
+
+<body class="bootstrap5">
+
+{% block body%} {% endblock%}
+
+<div class="col-md-12">
+    <p id="debug">{% block debug%} {% endblock%}</p>
+</div>
+
+</body>
+
+<script type = "text/javascript">
+    {% block custom_js %} {% endblock%}
+</script>
+
+</html>

@@ -1,0 +1,53 @@
+{% extends 'base_table.html' %}
+{% load bootstrap5 %}
+
+
+{% block page_title %} Create Data {% endblock %}
+
+{% block table_header %} Data Table Detail {% endblock %}
+
+{% block table %}
+
+{% comment%}
+This is a for loop that iterates through all the table definitions
+{% endcomment%}
+
+        {# Set up a striped table #}
+<table class="table table-striped">
+    {# Set up a table header #}
+    <thead>
+        <tr>
+            <td> Table </td>
+            <td> Description </td>
+            <td> Fields </td>
+            <td> Keys </td>
+            <td> Constraints </td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{ object.name }}</td> 
+            <td>{{ object.description }}</td>
+            <td>
+                {# Iterate through the fields for some context #}
+                {% for field in object.fields.all %}
+                    {# TODO: Add a link in to each of the individual fields #}
+                    {{ field.name }}
+                    {# Comma separate things, but not the last field #}
+                    {% if not forloop.last and forloop.counter < 4 %} 
+                        ,
+                    {% endif %}
+                {% endfor %}
+            </td>
+            {# TODO: Add a loop like we have for fields, if appropriate#}
+            <td>{{ object.keys }}</td>
+            {# TODO: Add a loop like we have for fields, if appropriate#}
+            <td>{{ object.constraints }}</td>
+        </tr>
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block debug %}
+{% endblock %}

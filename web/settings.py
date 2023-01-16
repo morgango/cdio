@@ -180,6 +180,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50,
 }
 
+LOGIN_REDIRECT_URL = "table-list"
+LOGOUT_REDIRECT_URL = "table-list"
+
+
 
 LOGGING = {
     'version': 1,

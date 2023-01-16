@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_table.html' %}
 {% load bootstrap5 %}
 
 
@@ -23,8 +23,7 @@ This is a for loop that iterates through all the table definitions
                     <td> Table </td>
                     <td> Description </td>
                     <td> Fields </td>
-                    <td> Keys </td>
-                    <td> Constraints </td>
+                    <td> Actions </td>
                 </tr>
             </thead>
             <tbody>
@@ -45,10 +44,10 @@ This is a for loop that iterates through all the table definitions
                 {% endif %}
             {% endfor %}
         </td>
-        {# TODO: Add a loop like we have for fields, if appropriate#}
-        <td>{{ table.keys }}</td>
-        {# TODO: Add a loop like we have for fields, if appropriate#}
-        <td>{{ table.constraints }}</td>
+        <td>
+            <a class="btn btn-warning" href= "/{{ table.author }}/tables/{{ table.slug }}/update">Edit</a>
+            <a class="btn btn-danger" href= "/{{ table.author }}/tables/{{ table.slug }}/delete">Delete</a>
+        </td>
     </tr>
     {% if forloop.last %}
     </tbody>
@@ -58,11 +57,17 @@ This is a for loop that iterates through all the table definitions
         <li>No tables yet.</li>
     </ul>
 {% endfor %}
-
+</table>
+<div class="col  d-flex justify-content-end align-items-center">
+    <a class="btn btn-primary" href="/{{ user.username }}/tables/create">Add a New Table</a>
+</div>
 {% endblock %}
 
+{% block modal %}
+<div id="modal" class="modal fade">
+    <div id="dialog" class="modal-dialog" hx-target="this"></div>
+ </div>
+{% endblock  %}
+
 {% block debug %}
-{{ user.name }}
-{{ author }}
-Something
 {% endblock %}

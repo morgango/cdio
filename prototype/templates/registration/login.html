@@ -1,0 +1,38 @@
+{%extends 'base_login.html'%}
+
+{%block login%}
+
+<div class="container" style="max-width: 400px; width: 400px">
+    <h1> {% block table_header %} {% endblock%} </h1>
+    <div class="col-md-12">
+        <div class="row table-responsive">
+            <form method="post" class="card" novalidate>
+
+                {% csrf_token %}
+                
+                <h2 class="text-center">Log In</h2>
+
+                {% for field in form %}
+                        {{ field.label_tag }} 
+                        {{ field }}
+                        {% if field.errors %}
+                            <small>{{ field.errors|striptags }}</small> 
+                        {% endif %}
+                {% endfor %}
+
+                <br>
+                <input type="submit" value="Login" class="btn btn-primary full-width">
+                <hr>
+                
+                <p class="text-center">Forgot your password <a href="#">Reset Password</a></p>
+                <p class="text-center">Don't have a account? <a href="{% url 'signup' %}">Join Now</a></p>
+
+            </form>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <p id="debug">{% block debug%} {% endblock%}</p>
+    </div>
+</div>
+
+{%endblock login%}
