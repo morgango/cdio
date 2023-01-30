@@ -2,6 +2,20 @@
 
 {% block body %}
 
+<form hx-post="{{ request.path }}" class="modal-content">
+  {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title">Delete {{ table }}</h5>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the table: {{ table }}?</p>
+        <input type="submit" value="Yes, delete." />
+      </div>
+      <div class="modal-footer">
+      </div>
+</form>
+
+{% comment %}
 <h1>Delete Table</h1>
 
 <p>Are you sure you want to delete the table: {{ table }}?</p>
@@ -10,5 +24,6 @@
   {% csrf_token %}
   <input type="submit" value="Yes, delete." />
 </form>
+{% endcomment %}
 
 {% endblock %}

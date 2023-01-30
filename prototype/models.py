@@ -199,6 +199,16 @@ class Table(models.Model):
         on_delete=models.CASCADE,
         default=0,
     )
+    rating = models.PositiveSmallIntegerField(choices=(
+        (0, "☆☆☆☆☆"),
+        (1, "★☆☆☆☆"),
+        (2, "★★☆☆☆"),
+        (3, "★★★☆☆"),
+        (4, "★★★★☆"),
+        (5, "★★★★★"),
+        ),
+        default = 0,
+        )
 
     class Meta:
         default_permissions = ('add', 'change', 'delete')

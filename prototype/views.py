@@ -1,6 +1,8 @@
 # from django.http import HttpResponse
 from django.shortcuts import render
-# from django.views.generic.list import ListView
+from django.http import HttpResponse, HttpRequest
+
+from render_block import render_block_to_string
 
 # for dealing with REST queries
 from rest_framework import viewsets, permissions
@@ -34,6 +36,7 @@ from .serializers import TableSerializer, UserSerializer
 from .forms import TableForm, RegisterUserForm
 from django.contrib.auth.forms import UserCreationForm
 
+
 fields_show = ['name', 'title', 'distribution', 'type', 'subtype', 'format', 'example', 'description'] 
 tables_show = ['name', 'description', ] 
 
@@ -43,9 +46,6 @@ tables_show = ['name', 'description', ]
 def index(request):
     return render(request, 'index.html')
     
-class HomeView(TemplateView):
-    template_engine="prototype/index.html"
-
 class SignUpView(CreateView):
     # form_class = UserCreationForm
     form_class = RegisterUserForm 
@@ -85,12 +85,22 @@ class FieldsListView(PermissionRequiredMixin, SingleTableView):
     def get_queryset(self, **kwargs):
          return Field.objects.filter(Q(author=self.request.user.id))
 
-# class TableListView(PermissionRequiredMixin, ListView):
 class TableListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Table
     template_name = 'prototype/table_list.html'
-    #permission_required = ['view_table', ]
     permission_required = []
+
+    def get(self, *args, **kwargs):
+
+        try:
+            kwargs['show'] == 'snippet'
+            html= "Hello there"
+            object_list = self.get_queryset()
+            context={'object_list': object_list}
+            html= render_block_to_string (self.template_name, 'table_body', context)
+            return HttpResponse(html)
+        except:
+            return super().get(*args, **kwargs)
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -115,7 +125,11 @@ class TableCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
 
         # validate the form for the values that were displayed
-        resp = super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # these are codes that will allow the page to know to refresh the table list
+        response['HX-Trigger'] = 'table_list_changed'
+        response.status_code = 204
 
         # assign object-level permissions for this Table
         assign_perm('view_table', self.request.user, self.object)
@@ -128,7 +142,7 @@ class TableCreateView(LoginRequiredMixin, CreateView):
         assign_perm('view_table', customers_grp, self.object)
         assign_perm('view_table', public_grp, self.object)
 
-        return resp
+        return response
 
 class TableUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Table
@@ -139,6 +153,17 @@ class TableDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Table
     success_url = reverse_lazy('table-list')
     permission_required = ['view_table', 'delete_table']
+
+    def form_valid(self, form):
+
+        # validate the form for the values that were displayed
+        response = super().form_valid(form)
+        
+        # these are codes that will allow the page to know to refresh the table list
+        response['HX-Trigger'] = 'table_list_changed'
+        response.status_code = 204
+
+        return response
 
 # Generating a REST response with all the TABLES
 class TableViewSet(viewsets.ModelViewSet):
