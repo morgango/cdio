@@ -1,0 +1,44 @@
+
+{% load bootstrap5 %}
+{% load static %}
+
+
+{% block table_body %}
+
+{% for table in object_list %}
+<tr>
+    <th scope="row">{{ forloop.counter }}</th>
+    <td>{{ table.name }}</td> 
+    <td>{{ table.description }}</td>
+    <td>{{ table.average_rating_stars }} <i>({{ table.average_rating }})</td>
+    <td>{{ table.likes.count }}</td>
+    <td>
+        {{ table.followers.all | slice:":3" | join:"," }}
+    </td>
+    <td>
+        <a class="btn btn-warning" href= "/{{ table.author }}/tables/{{ table.slug }}">Edit</a>
+        <button hx-target="#dialog" hx-get="/{{ table.author }}/tables/{{ table.slug }}/delete" class="btn btn-danger">
+            Delete
+        </button>
+        <button hx-post="/{{ table.author }}/tables/{{ table.slug }}/like" 
+               class="btn btn-info">
+            {% if user in table.likes.all %}
+                Unlike
+            {% else %}
+                Like
+            {% endif %}
+        </button>
+        <button hx-post="/{{ table.author }}/tables/{{ table.slug }}/follow" 
+               class="btn btn-success">
+            {% if user in table.followers.all %}
+                Unfollow
+            {% else %}
+                Follow
+            {% endif %}
+        </button>
+    </td>
+</tr>
+
+{% endfor %}
+
+{% endblock %}

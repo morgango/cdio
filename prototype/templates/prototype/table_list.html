@@ -12,7 +12,7 @@
 {% comment%}
 This is a for loop that iterates through all the table definitions
 {% endcomment%}
-
+            
 <table class="table table-striped">
     {# Set up a table header #}
     <thead>
@@ -21,10 +21,15 @@ This is a for loop that iterates through all the table definitions
             <td> Table </td>
             <td> Description </td>
             <td> Rating </td>
+            <td> Likes </td>
+            <td> Followers </td>
             <td> Actions </td>
         </tr>
     </thead>
-    <tbody hx-trigger="load, table_list_changed from:body" hx-get="{% url 'table-list-body' show='snippet' %}" hx-target="this">
+    <tbody hx-trigger="load, table_list_changed from:body" 
+            hx-get="{% url 'table-list-body' show='snippet' %}"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"'
+            hx-target="this">
     <tr>
         <td>There don't appear to be any tables yet.</td>
     </tr>
@@ -39,33 +44,7 @@ This is a for loop that iterates through all the table definitions
 {% endblock %}
 
 {% block table_body %}
-
-{% for table in object_list %}
-<tr>
-    {# Create an ID number based on the for loop iterations #}
-    <th scope="row">{{ forloop.counter }}</th>
-    <td>{{ table.name }}</td> 
-    <td>{{ table.description }}</td>
-    <td>{{ table.get_rating_display }}</td>
-    <td>
-        <a class="btn btn-warning" href= "/{{ table.author }}/tables/{{ table.slug }}/update">Edit</a>
-        <button hx-target="#dialog" hx-get="/{{ table.author }}/tables/{{ table.slug }}/delete" class="btn btn-danger">
-            Delete
-        </button>
-        {% comment %} We need to add hx-get and hx-target to open the modal, and add form_valid functions to the views
-        <a class="btn btn-warning" href= "/{{ table.author }}/tables/{{ table.slug }}/update">Edit</a>
-        <a class="btn btn-danger" href= "/{{ table.author }}/tables/{{ table.slug }}/delete">Delete</a>
-        <button hx-get="{% url 'table-update' %}" hx-target="#dialog" class="btn btn-primary">
-            Edit
-        </button>
-        <button hx-get="{% url 'table-delete' %}" hx-target="#dialog" class="btn btn-danger">
-            Delete
-        </button>
-        {% endcomment %}
-    </td>
-</tr>
-
-{% endfor %}
+{% comment %} This is intentionally left empty and should be filled by the snippet file {% endcomment %}
 
 {% endblock %}
 

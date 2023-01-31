@@ -13,7 +13,7 @@ from django.contrib import messages
 from django_tables2 import SingleTableView
 
 # for dealing with generic views
-from django.views.generic import CreateView, UpdateView, DeleteView, DetailView
+from django.views.generic import CreateView, UpdateView, DeleteView, DetailView, View
 from django.contrib.auth.views import LoginView
 from django.views.generic.list import ListView
 from django.urls import reverse_lazy
@@ -30,7 +30,7 @@ from guardian.mixins import PermissionRequiredMixin, PermissionListMixin
 from guardian.shortcuts import assign_perm, get_objects_for_user, get_perms_for_model
 
 # the data and fields that we are gong to be displaying in the views
-from .models import Field, Table
+from .models import Field, Table, Like, Comment, Follower
 from .tables import TablesTable, FieldsTable 
 from .serializers import TableSerializer, UserSerializer
 from .forms import TableForm, RegisterUserForm
@@ -87,20 +87,19 @@ class FieldsListView(PermissionRequiredMixin, SingleTableView):
 
 class TableListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Table
-    template_name = 'prototype/table_list.html'
     permission_required = []
+
+    snippet_key = 'show'
+    snippet_arg = 'snippet'
+    template_name = 'prototype/table_list.html'
+    template_name_snippet = f'prototype/table_list_{snippet_arg}.html'
 
     def get(self, *args, **kwargs):
 
-        try:
-            kwargs['show'] == 'snippet'
-            html= "Hello there"
-            object_list = self.get_queryset()
-            context={'object_list': object_list}
-            html= render_block_to_string (self.template_name, 'table_body', context)
-            return HttpResponse(html)
-        except:
-            return super().get(*args, **kwargs)
+        if self.snippet_key in kwargs and kwargs[self.snippet_key] == self.snippet_arg:
+            self.template_name = self.template_name_snippet
+        
+        return super().get(*args, **kwargs)
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -165,13 +164,58 @@ class TableDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 
         return response
 
-# Generating a REST response with all the TABLES
-class TableViewSet(viewsets.ModelViewSet):
-    queryset = Table.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = TableSerializer
-    
-# Generating a REST response with all the USERS
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+class TableLikeView(LoginRequiredMixin, View):
+
+    def post(self, *args, **kwargs):
+        
+        # get metadata about this incoming request
+        table_author_name = kwargs['author']
+        table_slug = kwargs['slug']
+
+        table_author = User.objects.get(username=table_author_name)
+        table = Table.objects.get(author=table_author.pk, slug=table_slug)
+       
+        if self.request.user in table.likes.all():
+            # remove this like
+            table.likes.remove(self.request.user)
+        else: 
+            # connect the saved like to the table.
+            table.likes.add(self.request.user)
+
+        # craft an empty response that will let the front end know to update itself.
+        response = HttpResponse("")
+        response['HX-Trigger'] = 'table_list_changed'
+        response.status_code = 204
+        
+        return response
+
+class TableFollowerView(LoginRequiredMixin, View):
+
+    def post(self, *args, **kwargs):
+        
+        # get metadata about this incoming request
+        table_author_name = kwargs['author']
+        table_slug = kwargs['slug']
+
+        table_author = User.objects.get(username=table_author_name)
+        table = Table.objects.get(author=table_author.pk, slug=table_slug)
+
+        if self.request.user in table.followers.all():
+            # remove this follow
+            table.followers.remove(self.request.user)
+        else: 
+            # connect the saved follower to the table.
+            table.followers.add(self.request.user)
+
+        # craft an empty response that will let the front end know to update itself.
+        response = HttpResponse("")
+        response['HX-Trigger'] = 'table_list_changed'
+        response.status_code = 204
+        
+        return response
+
+class TableCommentView(LoginRequiredMixin, View):
+    pass
+
+class TableRatingView(LoginRequiredMixin, View):
+    pass

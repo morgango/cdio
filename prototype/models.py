@@ -3,6 +3,52 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.urls import reverse
 from guardian.models import GroupObjectPermissionBase, UserObjectPermissionBase
+from django.contrib.auth.models import User
+from django.db.models import Avg
+
+class Comment(models.Model):
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(null=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,
+        default="",
+    )
+
+class Rating(models.Model):
+    name = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,
+        default=0,
+    )
+    value = models.PositiveSmallIntegerField(choices=(
+        (0, "☆☆☆☆☆"),
+        (1, "★☆☆☆☆"),
+        (2, "★★☆☆☆"),
+        (3, "★★★☆☆"),
+        (4, "★★★★☆"),
+        (5, "★★★★★"),
+        ),
+        default = 0,
+        )
+
+class Like(models.Model):
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(null=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,
+        default=0,
+    )
+
+class Follower(models.Model):
+    start = models.DateTimeField(auto_now=True)
+    end = models.DateTimeField(null=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  
+        on_delete=models.CASCADE,
+        default=0,
+    )
 
 # # see https://specs.frictionlessdata.io/table-schema/#constraints for more info
 class FieldConstraint(models.Model):
@@ -199,16 +245,11 @@ class Table(models.Model):
         on_delete=models.CASCADE,
         default=0,
     )
-    rating = models.PositiveSmallIntegerField(choices=(
-        (0, "☆☆☆☆☆"),
-        (1, "★☆☆☆☆"),
-        (2, "★★☆☆☆"),
-        (3, "★★★☆☆"),
-        (4, "★★★★☆"),
-        (5, "★★★★★"),
-        ),
-        default = 0,
-        )
+    ratings = models.ForeignKey(Rating, on_delete=models.CASCADE, null=True, blank=True)
+    comments = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
+
+    likes = models.ManyToManyField(User, related_name='table_likes')
+    followers = models.ManyToManyField(User, related_name='table_followers')
 
     class Meta:
         default_permissions = ('add', 'change', 'delete')
@@ -218,9 +259,32 @@ class Table(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def average_rating_stars(self):
+        
+        average_rating = round(self.average_rating())
+        match average_rating:
+            case 0:
+                return "☆☆☆☆☆"
+            case 1:
+                return "★☆☆☆☆"
+            case 2:
+                return "★★☆☆☆"
+            case 3:
+                return "★★★☆☆"
+            case 4:
+                return "★★★★☆"
+            case 5:
+                return "★★★★★"
+    
+    def average_rating(self):
 
-    # TODO: Set a path so that we can have tables and fields accessed by author and slug
-    # See https://wellfire.co/learn/fast-and-beautiful-urls-with-django/
+        if self.ratings is None:
+            return 0
+        else:
+            # return self.ratings.aggregate(Avg('rating'))
+            self.ratings.aggregate(models.Avg('rating')).get('rating__avg')
+
     def get_absolute_url(self):
         return reverse('table-slug', kwargs={'author': self.author, 'slug': self.slug})
         

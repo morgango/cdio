@@ -6,8 +6,8 @@
 
 {% include 'prototype/common/navbar.html' %}
 
-<body>
-
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    
 <div class="container" style="max-width: 1152px; width: 1152px">
     <h1> {% block table_header %} {% endblock%} </h1>
     <div class="col-md-12">
